@@ -146,7 +146,7 @@ export default function Home() {
 
   const handleWithdraw = () => {
     if (!withdrawAmount || !userShares) return;
-    const sharesToWithdraw = (parseUnits(withdrawAmount, 6) * userShares) / (userBalance || 1n);
+    const sharesToWithdraw = (parseUnits(withdrawAmount, 6) * userShares) / (userBalance || BigInt(1));
     withdraw({
       address: ADDRESSES.AUTOMATION_VAULT,
       abi: AUTOMATION_VAULT_ABI,
@@ -159,12 +159,12 @@ export default function Home() {
 
   // Calculate effective APY (weighted average based on allocations)
   const effectiveAPY = (() => {
-    const a = allocationA || 0n;
-    const b = allocationB || 0n;
+    const a = allocationA || BigInt(0);
+    const b = allocationB || BigInt(0);
     const total = a + b;
-    if (total === 0n) return lastApyB || vaultBAPY || 0n;
-    const apyA = lastApyA || vaultAAPY || 0n;
-    const apyB = lastApyB || vaultBAPY || 0n;
+    if (total === BigInt(0)) return lastApyB || vaultBAPY || BigInt(0);
+    const apyA = lastApyA || vaultAAPY || BigInt(0);
+    const apyB = lastApyB || vaultBAPY || BigInt(0);
     return (apyA * a + apyB * b) / total;
   })();
 
@@ -175,9 +175,9 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-[var(--foreground)] flex items-center justify-center">
-              <span className="text-[var(--background)] text-sm font-bold">R</span>
+              <span className="text-[var(--background)] text-sm font-bold">V</span>
             </div>
-            <span className="font-semibold text-lg">Reactive Vault</span>
+            <span className="font-semibold text-lg">Vaultus</span>
           </div>
           
           {isConnected ? (
@@ -274,7 +274,7 @@ export default function Home() {
                           className="flex-1 px-4 py-3 bg-transparent outline-none text-lg"
                         />
                         <button
-                          onClick={() => setDepositAmount(formatUnits(usdcBalance || 0n, 6))}
+                          onClick={() => setDepositAmount(formatUnits(usdcBalance || BigInt(0), 6))}
                           className="px-4 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
                         >
                           MAX
@@ -330,7 +330,7 @@ export default function Home() {
                           className="flex-1 px-4 py-3 bg-transparent outline-none text-lg"
                         />
                         <button
-                          onClick={() => setWithdrawAmount(formatUnits(userBalance || 0n, 6))}
+                          onClick={() => setWithdrawAmount(formatUnits(userBalance || BigInt(0), 6))}
                           className="px-4 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
                         >
                           MAX
@@ -395,8 +395,8 @@ export default function Home() {
                     <div 
                       className="h-full bg-[var(--foreground)] transition-all duration-500"
                       style={{ 
-                        width: `${totalAssets && totalAssets > 0n 
-                          ? Number((allocationA || 0n) * 100n / totalAssets) 
+                        width: `${totalAssets && totalAssets > BigInt(0) 
+                          ? Number((allocationA || BigInt(0)) * BigInt(100) / totalAssets) 
                           : 0}%` 
                       }}
                     />
@@ -411,8 +411,8 @@ export default function Home() {
                     <div 
                       className="h-full bg-[var(--foreground)] transition-all duration-500"
                       style={{ 
-                        width: `${totalAssets && totalAssets > 0n 
-                          ? Number((allocationB || 0n) * 100n / totalAssets) 
+                        width: `${totalAssets && totalAssets > BigInt(0) 
+                          ? Number((allocationB || BigInt(0)) * BigInt(100) / totalAssets) 
                           : 0}%` 
                       }}
                     />
@@ -454,7 +454,7 @@ export default function Home() {
               { label: "Automation Vault", address: ADDRESSES.AUTOMATION_VAULT },
               { label: "Vault A", address: ADDRESSES.VAULT_A },
               { label: "Vault B", address: ADDRESSES.VAULT_B },
-              { label: "Reactive Vault", address: ADDRESSES.REACTIVE_VAULT },
+              { label: "Vaultus", address: ADDRESSES.REACTIVE_VAULT },
             ].map((item) => (
               <div key={item.label} className="p-4 bg-[var(--card)] rounded-lg">
                 <p className="text-sm text-[var(--muted)] mb-1">{item.label}</p>
@@ -471,33 +471,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] mt-16">
-        <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-[var(--muted)]">
-            Built with Reactive Network
-          </p>
-          <div className="flex gap-6">
-            <a
-              href="https://docs.reactive.network"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-            >
-              Docs
-            </a>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-            >
-              GitHub
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
