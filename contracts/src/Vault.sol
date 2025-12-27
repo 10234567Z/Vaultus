@@ -107,13 +107,17 @@ contract Vault is Ownable, ReentrancyGuard {
         whenNotPaused 
         validAmount(amount) 
     {
+        uint256 oldAPY = _calculateAPY();
+        
         asset.safeTransferFrom(msg.sender, address(this), amount);
         
         s_deposits[msg.sender] += amount;
         s_depositTimestamp[msg.sender] = block.timestamp;
         s_totalDeposits += amount;
 
+        uint256 newAPY = _calculateAPY();
         emit Vault__Deposit(msg.sender, amount, s_deposits[msg.sender]);
+        emit Vault__APYUpdated(oldAPY, newAPY);
     }
 
     /**
@@ -127,12 +131,16 @@ contract Vault is Ownable, ReentrancyGuard {
         validAmount(amount) 
         sufficientBalance(msg.sender, amount) 
     {
+        uint256 oldAPY = _calculateAPY();
+        
         s_deposits[msg.sender] -= amount;
         s_totalDeposits -= amount;
 
         asset.safeTransfer(msg.sender, amount);
 
+        uint256 newAPY = _calculateAPY();
         emit Vault__Withdraw(msg.sender, amount, s_deposits[msg.sender]);
+        emit Vault__APYUpdated(oldAPY, newAPY);
     }
 
     /**
@@ -142,12 +150,16 @@ contract Vault is Ownable, ReentrancyGuard {
         uint256 userBalance = s_deposits[msg.sender];
         if (userBalance == 0) revert Vault__NoDeposit();
 
+        uint256 oldAPY = _calculateAPY();
+
         s_deposits[msg.sender] = 0;
         s_totalDeposits -= userBalance;
 
         asset.safeTransfer(msg.sender, userBalance);
 
+        uint256 newAPY = _calculateAPY();
         emit Vault__Withdraw(msg.sender, userBalance, 0);
+        emit Vault__APYUpdated(oldAPY, newAPY);
     }
 
     /**
